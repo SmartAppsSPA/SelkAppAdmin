@@ -1,0 +1,27 @@
+<!--
+  Generated template for the NewBusinessPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Nueva Empresa</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	<ion-item>
+		<ion-label>Nombre:</ion-label> <ion-input type="text" [(ngModel)] = "name" ></ion-input>
+	</ion-item>
+	<ion-item>
+		<ion-label>Email:</ion-label> <ion-input type="text" [(ngModel)] = "email" ></ion-input>
+	</ion-item>
+	<ion-item>
+		<ion-label>Teléfono:</ion-label> <ion-input type="text" [(ngModel)] = "phone" ></ion-input>
+	</ion-item>
+	<button ion-button block (click)="addBusiness({name: name, email: email, phone: phone})">Agregar Empresa</button>
+</ion-content>

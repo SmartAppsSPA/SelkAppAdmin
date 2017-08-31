@@ -1,14 +1,24 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Sistema de Administración Selk'App
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+	<h4>Opciones</h4>
+	<ion-item>
+		<button ion-button color="primary" [navPush]="newBusinessPage">Nueva empresa</button>
+		<button ion-button color="primary">Preview Notificaciones</button>
+	</ion-item>
+	<h4>Empresas</h4>
+ 	<ion-list>
+	  <ion-item *ngFor="let b of business | async">
+	  	<span  (click)="edit(b.$key, b)">
+	    	{{b.info.name}}
+	  	</span>
+	    <button ion-button color="danger" float-right (click)="delete(b.$key)">Eliminar</button>
+	  </ion-item>
+	</ion-list>
 </ion-content>
