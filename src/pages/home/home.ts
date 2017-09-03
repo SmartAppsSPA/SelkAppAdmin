@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NewBusinessPage } from '../new-business/new-business';
+import { NotificationsPage } from '../notifications/notifications';
 import { EditPage } from '../edit/edit';
 import { NavController, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
@@ -13,12 +14,14 @@ export class HomePage {
 
   businessList: any;
   newBusinessPage: any;
+  notificationsPage: any;
   editBusiness: any;
   loader: any;
 
   constructor(public navCtrl: NavController, public firebase: FirebaseProvider, public loading: LoadingController, public alertCtrl: AlertController, public toastCtrl: ToastController) {
 
     this.newBusinessPage = NewBusinessPage;
+    this.notificationsPage = NotificationsPage;
   	this.editBusiness = EditPage;
 
   	this.loader = this.loading.create({

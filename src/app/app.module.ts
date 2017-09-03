@@ -10,6 +10,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { EditPage } from '../pages/edit/edit';
 import { NewBusinessPage } from '../pages/new-business/new-business';
+import { NotificationsPage } from '../pages/notifications/notifications';
 import { FirebaseProvider } from '../providers/firebase/firebase';
 
 export const firebaseConfig = {
@@ -26,6 +27,7 @@ export const firebaseConfig = {
     MyApp,
     HomePage,
     EditPage,
+    NotificationsPage,
     NewBusinessPage
   ],
   imports: [
@@ -39,6 +41,7 @@ export const firebaseConfig = {
     MyApp,
     HomePage,
     EditPage,
+    NotificationsPage,
     NewBusinessPage
   ],
   providers: [

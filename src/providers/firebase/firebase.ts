@@ -55,12 +55,7 @@ export class FirebaseProvider {
 
 	getOffers(idBusiness) {
 		return new Promise(resolve => {
-			(this.db.list('/offers/', {
-				query: {
-					orderByChild: 'business',
-					equalTo: idBusiness
-				}
-			}).map((arr) => { 
+			(this.db.list('/offers/' + idBusiness).map((arr) => { 
 				return arr.reverse();
 			})).subscribe(data => {
 				resolve(data);
@@ -68,7 +63,7 @@ export class FirebaseProvider {
 		});
 	}
 
-	postOffer(idBusiness, newOffer) {
+	postOffer(idBusiness, text, length) {
 		let fullDate = new Date();
 
 		/**** Separa fecha completa en fecha y horas, con ceros a la izquierda ****/
@@ -77,32 +72,69 @@ export class FirebaseProvider {
 		/**** Fin fecha y hora ****/
 
 		return new Promise(resolve => {
-			this.db.list('/offers/').push({
-		      date: date,
-		      hour: hour,
-		      text: newOffer,
-		      business: idBusiness
-		    }).then(data => {
-		    	resolve(data);
-		    });			
-		})
+			this.db.object('/business/' + idBusiness).subscribe(data => {
+				let newData = {
+				  date: date,
+				  hour: hour,
+				  text: text
+				}
+
+				//Agrega a listado de ofertas generales
+				this.db.list('/offers/' + idBusiness + '/').push(newData).then(data2 => {
+
+					//Complementa con datos de la empresa para rápido acceso 
+					let newNotification = {
+					  date: date,
+					  hour: hour,
+					  text: text,
+						name: data.info.name,
+						idOffer: data2.key
+					}
+
+					//Agrega a notificaciones (sólo última oferta por empresa)
+					this.db.object('/notifications/' + idBusiness + '/').set(newNotification);
+
+					resolve(newData);					
+				})
+
+			})
+		});			
+
 	}
 
-	putOffer(idOffer, offer) {
+	putOffer(idBusiness, idOffer, offer) {
 		return new Promise(resolve => {
-			this.db.object('/offers/' + idOffer).update({
+			this.db.object('/offers/' + idBusiness + '/' + idOffer).update({
 				text: offer
 			}).then(data => {
 				resolve(idOffer);
 			});
-		})
+		});
 	}
 
-	deleteOffer(idOffer) {
+	deleteOffer(idBusiness, idOffer) {
 		return new Promise(resolve => {
-			this.db.object('/offers/' + idOffer).remove().then(data => {
-				resolve(idOffer);
+			let lastNotification = this.db.object('/notifications/' + idBusiness);
+
+			lastNotification.subscribe(data => {
+				if (data.idOffer == idOffer) {
+				 	lastNotification.remove();
+				}
 			});
-		})
+
+			this.db.object('/offers/' + idBusiness + '/' + idOffer).remove();
+			
+			resolve(idOffer);
+		});
+	}
+
+	getNotifications () {
+		return new Promise(resolve => {
+			(this.db.list('/notifications')).map(e => {
+				return e;
+			}).subscribe(data => {
+				resolve(data);
+			});
+		});
 	}
 }

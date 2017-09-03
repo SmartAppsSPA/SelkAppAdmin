@@ -26,6 +26,7 @@ export class EditPage {
     this.id = navParams.get('id');
     this.changed = false;
     this.newOffer = '';
+    this.offers = [];
 
     this.getBusiness();
 
@@ -101,7 +102,7 @@ export class EditPage {
   }
 
   addOffer(newOffer) {
-    this.firebase.postOffer(this.id, newOffer).then(data => {
+    this.firebase.postOffer(this.id, newOffer, this.offers.length).then(data => {
       this.getOffers();
     });
 
@@ -129,7 +130,7 @@ export class EditPage {
         {
           text: 'Eliminar',
           handler: () => {
-            this.firebase.deleteOffer(idOffer).then(data => {
+            this.firebase.deleteOffer(this.id, idOffer).then(data => {
               this.getOffers();
             });
           }
@@ -161,7 +162,7 @@ export class EditPage {
         {
           text: 'Save',
           handler: data => {
-            this.firebase.putOffer(idOffer, data.offer).then(data => {
+            this.firebase.putOffer(this.id, idOffer, data.offer).then(data => {
               this.getOffers();
             });
           }
