@@ -10,6 +10,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { EditPage } from '../pages/edit/edit';
 import { NewBusinessPage } from '../pages/new-business/new-business';
+import { FirebaseProvider } from '../providers/firebase/firebase';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCL8IYoQfAmdV20RA2pMg3HgWbX81PGwR8",
@@ -43,7 +44,8 @@ export const firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    FirebaseProvider,
   ]
 })
 export class AppModule {}

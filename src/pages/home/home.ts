@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable  } from 'angularfire2/database';
 import { NewBusinessPage } from '../new-business/new-business';
 import { EditPage } from '../edit/edit';
 import { NavController, LoadingController, AlertController, ToastController } from 'ionic-angular';
+import { FirebaseProvider } from '../../providers/firebase/firebase';
 
 
 @Component({
@@ -11,13 +11,12 @@ import { NavController, LoadingController, AlertController, ToastController } fr
 })
 export class HomePage {
 
-  business: FirebaseListObservable<any>;
-  offers: FirebaseListObservable<any>;
+  businessList: any;
   newBusinessPage: any;
   editBusiness: any;
   loader: any;
 
-  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public loading: LoadingController, public alertCtrl: AlertController, public toastCtrl: ToastController) {
+  constructor(public navCtrl: NavController, public firebase: FirebaseProvider, public loading: LoadingController, public alertCtrl: AlertController, public toastCtrl: ToastController) {
 
     this.newBusinessPage = NewBusinessPage;
   	this.editBusiness = EditPage;
@@ -28,10 +27,10 @@ export class HomePage {
     });
 
     this.loader.present().then(() => {
-	  	this.business = db.list('/business');
-
-	  	this.business.subscribe(data => {
-	  		this.loader.dismiss();
+      firebase.businessList.subscribe(data => {
+        // console.log(data);
+	  	  this.businessList = data;
+	  	  this.loader.dismiss();
 	  	});
     });
   }
@@ -44,13 +43,13 @@ export class HomePage {
         {
           text: 'Cancelar',
           handler: () => {
-            console.log('Disagree clicked');
+            // console.log('Disagree clicked');
           }
         },
         {
           text: 'Confirmar',
           handler: () => {
-            this.business.remove(id);
+            this.firebase.deleteBusiness(id);
 
             let toast = this.toastCtrl.create({
               message: 'La empresa fue eliminada con éxito.',
@@ -59,7 +58,7 @@ export class HomePage {
             });
 
             toast.onDidDismiss(() => {
-              console.log('Dismissed toast');
+              // console.log('Dismissed toast');
             });
 
             toast.present();
@@ -71,31 +70,19 @@ export class HomePage {
     confirm.present();
   }
 
-  edit(id, e) {
-    this.offers = this.db.list('/offers/', {
-      query: {
-        orderByChild: 'business',
-        equalTo: id
-      }
-    });
-
+  edit(id, e) { 
     this.loader = this.loading.create({
       spinner: 'bubbles',
       content: 'Cargando datos'
     });
 
     this.loader.present().then(() => {
-      this.business.subscribe(data => {
-        this.loader.dismiss();
+      this.navCtrl.push(this.editBusiness, {
+        id: id
       });
-    });
 
-    this.navCtrl.push(this.editBusiness, {
-      id: id,
-      offers: this.offers
+      this.loader.dismiss();
     });
-    
-
   }
 
   ionViewDidLoad() {

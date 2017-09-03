@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase, FirebaseObjectObservable  } from 'angularfire2/database';
 import { ToastController, AlertController } from 'ionic-angular';
-
+import { FirebaseProvider } from '../../providers/firebase/firebase';
 /**
  * Generated class for the EditPage page.
  *
@@ -17,85 +16,102 @@ import { ToastController, AlertController } from 'ionic-angular';
 })
 export class EditPage {
 
-	business: FirebaseObjectObservable<any>;
-	id: any;
-	offers: FirebaseObjectObservable<any>;
-	changed: boolean;
+  business: any;
+  id: any;
+  offers: any;
+  changed: boolean;
   newOffer: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public toastCtrl: ToastController, public alertCtrl: AlertController) {
-  	this.id = navParams.get('id');
-  	this.offers = navParams.get('offers');
-  	this.changed = false;
+  constructor(public navCtrl: NavController, public navParams: NavParams, public firebase: FirebaseProvider, public toastCtrl: ToastController, public alertCtrl: AlertController) {
+    this.id = navParams.get('id');
+    this.changed = false;
     this.newOffer = '';
 
-  	db.object('/business/' + this.id).subscribe(data => {
-  		this.business = data;  		
-  	});
+    this.getBusiness();
 
+    this.getOffers();
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad EditPage');
+    // console.log('ionViewDidLoad EditPage');
+  }
+
+  getBusiness() {
+    this.firebase.getBusiness(this.id).then(data => {
+      this.business = data;
+      // console.log(this.business);
+    });
   }
 
   save() {
-  	this.db.object('/business/' + this.id).set(this.business);
-  	//this.navCtrl.pop();
+    this.firebase.putBusiness(this.id, this.business);
 
-  	let toast = this.toastCtrl.create({
-	    message: 'La información de la empresa fue guardada con éxito.',
-	    duration: 2000,
-	    position: 'bottom'
-	  });
+    let toast = this.toastCtrl.create({
+      message: 'La información de la empresa fue guardada con éxito.',
+      duration: 2000,
+      position: 'bottom'
+    });
 
-	  toast.onDidDismiss(() => {
-	    console.log('Dismissed toast');
-	  });
+    toast.onDidDismiss(() => {
+      // console.log('Dismissed toast');
+    });
 
-	  toast.present();
+    toast.present();
 
-	  this.changed = false;
+    this.changed = false;
+
+    this.navCtrl.pop();
   }
 
   changedToTrue() {
-  	this.changed = true;
+    this.changed = true;
   }
 
+  
   ionViewWillLeave() {
-  	if (this.changed) {
-	    let alert = this.alertCtrl.create({
-		    title: '¿Guardar cambios?',
-		    message: '¿Quieres guardar los cambios?',
-		    buttons: [
-		      {
-		        text: 'Cancelar',
-		        role: 'cancel',
-		        handler: () => {
-		          console.log('Cancel clicked');
-		        }
-		      },
-		      {
-		        text: 'Guardar',
-		        handler: () => {
-		          this.save();
-		        }
-		      }
-		    ]
-		  });
+    if (this.changed) {
+      let alert = this.alertCtrl.create({
+        title: '¿Guardar cambios?',
+        message: '¿Quieres guardar los cambios?',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => {
+              // console.log('Cancel clicked');
+            }
+          },
+          {
+            text: 'Guardar',
+            handler: () => {
+              this.save();
+            }
+          }
+        ]
+      });
 
-		  alert.present();  		
-  	}
+      alert.present();      
+    }
   }
 
-  addOffer(id, newOffer) {
-  	this.db.list('/offers/').push({
-  		date: Date(),
-  		text: newOffer,
-  		business: id
-  	});
+  newOfferKeyup(event, newOffer) {
+    if (event.keyCode == 13) {
+      this.addOffer(newOffer);
+    }
+  }
+
+  addOffer(newOffer) {
+    this.firebase.postOffer(this.id, newOffer).then(data => {
+      this.getOffers();
+    });
 
     this.newOffer = '';
+  }
+
+  getOffers() {
+    this.firebase.getOffers(this.id).then(data => {
+      this.offers = data;
+    })
   }
 
   removeOffer(idOffer) {
@@ -107,13 +123,15 @@ export class EditPage {
           text: 'Cancelar',
           role: 'cancel',
           handler: () => {
-            console.log('Cancel clicked');
+            // console.log('Cancel clicked');
           }
         },
         {
           text: 'Eliminar',
           handler: () => {
-            this.db.object('/offers/' + idOffer).remove();
+            this.firebase.deleteOffer(idOffer).then(data => {
+              this.getOffers();
+            });
           }
         }
       ]
@@ -121,5 +139,35 @@ export class EditPage {
 
     alert.present(); 
   }
-
+  
+  editOffer(idOffer, offer) {
+    let prompt = this.alertCtrl.create({
+      title: 'Editar Oferta',
+      message: "Ingresa el texto corregido de la oferta",
+      inputs: [
+        {
+          name: 'offer',
+          placeholder: 'Title',
+          value: offer
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+            // console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Save',
+          handler: data => {
+            this.firebase.putOffer(idOffer, data.offer).then(data => {
+              this.getOffers();
+            });
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
 }

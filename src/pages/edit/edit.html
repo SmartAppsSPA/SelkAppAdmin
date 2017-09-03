@@ -34,11 +34,13 @@
 	<ion-card padding>
 		<ion-list>
 			<ion-card padding>
-				<ion-input [(ngModel)]="newOffer" border placeholder="Ingresa el texto de una nueva oferta"></ion-input>
-				<button ion-button (click)="addOffer(business.$key, newOffer)">Agregar Oferta</button>
+				<ion-input [(ngModel)]="newOffer" (keyup)="newOfferKeyup($event, newOffer)" border placeholder="Ingresa el texto de una nueva oferta"></ion-input>
+				<button ion-button (click)="addOffer(newOffer)">Agregar Oferta</button>
 			</ion-card>
-			<ion-item *ngFor="let o of offers | async">
-				<span>{{ o.text }}</span>
+			<ion-item *ngFor="let o of offers">
+				<span  (click)="editOffer(o.$key, o.text)" >
+					<small style="color: #AAA">[{{ o.hour }} {{ o.date }}]:</small> {{ o.text }}
+				</span>
 				<button ion-button float-right (click)="removeOffer(o.$key)">Eliminar</button>
 			</ion-item>
 		</ion-list>

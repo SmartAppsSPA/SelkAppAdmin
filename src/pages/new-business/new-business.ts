@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { LoadingController } from 'ionic-angular';
+import { FirebaseProvider } from '../../providers/firebase/firebase';
 
 /**
  * Generated class for the NewBusinessPage page.
@@ -16,43 +16,28 @@ import { LoadingController } from 'ionic-angular';
   templateUrl: 'new-business.html',
 })
 export class NewBusinessPage {
-  business: FirebaseListObservable<any>;
   loader: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, db: AngularFireDatabase, public loading: LoadingController) {
-  	this.business = db.list('/business');
-    
+  constructor(public navCtrl: NavController, public navParams: NavParams, public loading: LoadingController, public firebase:FirebaseProvider) {
+  	
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad NewBusinessPage');
+    // console.log('ionViewDidLoad NewBusinessPage');
   }
 
-  addBusiness(data) {
-
-    console.log(data);
-
+  postBusiness (business) {
     let loader = this.loading.create({
-  	  spinner: 'bubbles',
+      spinner: 'bubbles',
       content: 'Guardando Empresa'
     });
 
     loader.present().then(() => {
-      this.business.push({
-        info: {
-          name: data.name,
-          email: data.email,
-          phone:  data.phone
-        },
-        premium: false,
-        offers: ['¡Queremos darte la bienvenida! En ' + data.name +  ' estamos felices de poder compartir contigo nuestras promociones y ofertas.']
-      }).then( newContact => {
+      this.firebase.postBusiness(business).then(data => {
+        // console.log(data);
         loader.dismiss();
-        this.navCtrl.pop();
-      }, error => {
-        console.log(error);
+        this.navCtrl.pop();        
       });
     });
   }
-
 }
