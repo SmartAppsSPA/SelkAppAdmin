@@ -27,6 +27,9 @@ export class NewBusinessPage {
   }
 
   postBusiness (business) {
+
+    if (!business.name) return;
+
     let loader = this.loading.create({
       spinner: 'bubbles',
       content: 'Guardando Empresa'

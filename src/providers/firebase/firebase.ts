@@ -30,8 +30,8 @@ export class FirebaseProvider {
 			this.businessList.push({
 				info: {
 					name: business.name,
-					email: business.email,
-					phone:  business.phone
+					email: business.email || '',
+					phone:  business.phone || ''
 				},
 				premium: false
 			}).then( newBusiness => {
